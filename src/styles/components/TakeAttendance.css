@@ -1,0 +1,97 @@
+.attendance-card {
+  background: var(--card-bg);
+  border-radius: 20px;
+  padding: 24px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow: 0 24px 50px rgba(15, 23, 42, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.attendance-card h2 {
+  margin: 0;
+  font-size: 20px;
+}
+
+.attendance-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.attendance-toolbar input[type="date"] {
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+}
+
+.attendance-toolbar button {
+  border: none;
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.attendance-toolbar .primary {
+  background: var(--primary);
+  color: #fff;
+}
+
+.attendance-toolbar .ghost {
+  background: #ecfccb;
+  color: #3f6212;
+}
+
+.attendance-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+.attendance-tile {
+  padding: 16px;
+  border-radius: 16px;
+  border: 2px solid transparent;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  transition: transform 120ms ease, border-color 120ms ease;
+  gap: 12px;
+}
+
+.attendance-tile.present {
+  background: #ecfdf3;
+  border-color: rgba(5, 150, 105, 0.4);
+}
+
+.attendance-tile.absent {
+  background: #fef2f2;
+  border-color: rgba(239, 68, 68, 0.4);
+}
+
+.attendance-tile:hover {
+  transform: translateY(-2px);
+}
+
+.tile-identity {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.roll-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 48px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(79, 70, 229, 0.12);
+  color: var(--primary-dark);
+  font-weight: 600;
+  font-size: 13px;
+}
+

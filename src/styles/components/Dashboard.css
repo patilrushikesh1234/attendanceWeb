@@ -1,0 +1,65 @@
+.dashboard {
+  padding: 32px clamp(16px, 4vw, 64px) 48px;
+}
+
+.dashboard-hero {
+  background: linear-gradient(120deg, #4f46e5, #818cf8);
+  color: #fff;
+  border-radius: 28px;
+  padding: 32px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 40px 80px rgba(79, 70, 229, 0.3);
+}
+
+.dashboard-hero h1 {
+  margin: 0 0 8px;
+  font-size: clamp(28px, 4vw, 40px);
+}
+
+.dashboard-hero p {
+  margin: 0;
+  opacity: 0.9;
+}
+
+.dashboard-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.dashboard-actions button {
+  border: none;
+  border-radius: 999px;
+  padding: 12px 18px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.dashboard-actions .ghost {
+  background: rgba(255, 255, 255, 0.16);
+  color: #fff;
+}
+
+.dashboard-actions .ghost:hover {
+  background: rgba(255, 255, 255, 0.26);
+}
+
+.dashboard-actions .logout {
+  background: #f87171;
+  color: #fff;
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 24px;
+  margin-top: 32px;
+}
+
+
+
+
