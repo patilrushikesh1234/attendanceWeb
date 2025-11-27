@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "../styles/components/PasswordGate.css";
 
-const DEFAULT_PASSWORD = "ssvpsbca@18";
+const DEFAULT_PASSWORD = "prgbca@123";
 
 export default function PasswordGate({ onSuccess, password = DEFAULT_PASSWORD }) {
   const [value, setValue] = useState("");
