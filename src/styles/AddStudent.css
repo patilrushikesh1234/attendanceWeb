@@ -1,0 +1,65 @@
+.add-card {
+  background: var(--card-bg);
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 4px 18px rgba(0,0,0,0.06);
+}
+
+.add-form {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+
+.add-input {
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  flex: 1;
+}
+
+.add-submit {
+  padding: 10px 16px;
+  border-radius: 10px;
+  background: var(--primary);
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+.add-submit:hover {
+  background: var(--primary-dark);
+}
+
+.form-error {
+  color: #e11d48;
+  font-size: 14px;
+  margin-top: 6px;
+  margin-bottom: 8px;
+}
+
+
+.students-list {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.student-pill {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 12px;
+  background: #f7f7ff;
+  border-radius: 10px;
+}
+
+.pill-action {
+  background: transparent;
+  border: 1px solid var(--danger);
+  border-radius: 8px;
+  color: var(--danger);
+  cursor: pointer;
+  padding: 4px 10px;
+}

@@ -1,0 +1,38 @@
+.class-selector-container {
+  background: rgba(255,255,255,0.95);
+  padding: 16px;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+  margin: 16px 0;
+}
+
+.class-selector-wrapper {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.class-label {
+  font-weight: 600;
+}
+
+.class-select {
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--card-bg);
+  cursor: pointer;
+}
+
+.class-select:focus {
+  border-color: var(--primary);
+}
+
+.selected-class-badge {
+  padding: 6px 12px;
+  border-radius: 12px;
+  background: var(--primary);
+  color: white;
+  font-weight: 600;
+}

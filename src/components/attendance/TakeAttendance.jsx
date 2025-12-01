@@ -1,90 +1,115 @@
-import React, { useEffect, useMemo, useState } from "react";
-import useLocalStorage from "../../hooks/useLocalStorage";
-import { exportTodayAttendanceCSV } from "../../utils/helpers";
-import "../../styles/components/TakeAttendance.css";
+import React, { useState, useEffect } from "react";
+import "../../styles/TakeAttendance.css";
+import { loadJSON, saveJSON, downloadCSV } from "../../utils/helpers";
 
-export default function TakeAttendance() {
-  const [students] = useLocalStorage("students", []);
-  const [records, setRecords] = useLocalStorage("records", {});
-  const [date, setDate] = useState(() => new Date().toISOString().split("T")[0]);
-  const [session, setSession] = useState({});
+export default function TakeAttendance({ classId, setRefreshReport }) {
+  const [students, setStudents] = useState([]);
+  const [attendance, setAttendance] = useState({});
+  const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
 
+  const studentsKey = `students_${classId}`;
+  const attendanceKey = `attendance_${classId}`;
+
+  // Load students + attendance on class/date change
   useEffect(() => {
-    const snapshot = records[date] || {};
-    const initialSession = {};
-    students.forEach((student) => {
-      initialSession[student.id] = snapshot[student.id] || "Absent";
+    const savedStudents = loadJSON(studentsKey, []);
+    setStudents(savedStudents);
+
+    const allAttendance = loadJSON(attendanceKey, {});
+    setAttendance(allAttendance[date] || {});
+  }, [classId, date]);
+
+
+  // Toggle Present / Absent
+  const toggleStatus = (id) => {
+    const newStatus = attendance[id] === "Present" ? "Absent" : "Present";
+    const updated = { ...attendance, [id]: newStatus };
+
+    setAttendance(updated);
+
+    const allAttendance = loadJSON(attendanceKey, {});
+    allAttendance[date] = updated;
+    saveJSON(attendanceKey, allAttendance);
+  };
+
+
+  // ✅ Save Session — sends to SemesterReport IMMEDIATELY
+  const saveSession = () => {
+    const allAttendance = loadJSON(attendanceKey, {});
+    allAttendance[date] = attendance;
+    saveJSON(attendanceKey, allAttendance);
+
+    // 🔥 This forces SemesterReport to reload immediately
+    if (setRefreshReport) {
+      setRefreshReport(prev => !prev);
+    }
+
+    alert("Session Saved Successfully!");
+  };
+
+
+  // Export today's CSV
+  const exportTodayCSV = () => {
+    if (students.length === 0) {
+      alert("No students available.");
+      return;
+    }
+
+    const rows = [["Date", "Roll No", "Student Name", "Status"]];
+
+    students.forEach((s) => {
+      rows.push([
+        date,
+        s.rollNumber,
+        s.name,
+        attendance[s.id] || "Absent"
+      ]);
     });
-    setSession(initialSession);
-  }, [date, students, records]);
 
-  const presentCount = useMemo(
-    () => Object.values(session).filter((status) => status === "Present").length,
-    [session]
-  );
-
-  const toggleStatus = (studentId) => {
-    setSession((prev) => ({
-      ...prev,
-      [studentId]: prev[studentId] === "Present" ? "Absent" : "Present",
-    }));
+    downloadCSV(`attendance_${classId}_${date}.csv`, rows);
   };
 
-  const handleSave = () => {
-    setRecords((prev) => ({ ...prev, [date]: session }));
-    alert("Attendance saved successfully.");
-  };
-
-  const handleExportToday = () => {
-    exportTodayAttendanceCSV({ dateStr: date, students, record: session });
-  };
 
   return (
-    <article className="attendance-card">
+    <div className="attendance-card">
       <header>
-        <h2>Attendance</h2>
-        <p className="empty-state">
-          {presentCount} / {students.length || 0} marked present for {date}.
-        </p>
-      </header>
+        <h2>Take Attendance</h2>
 
-      <div className="attendance-toolbar">
-        <input
-          type="date"
-          value={date}
-          onChange={(event) => setDate(event.target.value)}
-        />
-        <button className="primary" type="button" onClick={handleSave}>
-          Save session
-        </button>
-        <button className="ghost" type="button" onClick={handleExportToday}>
-          Download CSV
-        </button>
-      </div>
+        <div className="date-set">
+          <input
+            type="date"
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+          />
+        </div>
+      </header>
 
       <div className="attendance-list">
         {students.length === 0 && (
-          <p className="empty-state">Add students to take attendance.</p>
+          <p className="empty-state">No students in this class</p>
         )}
 
-        {students.map((student) => {
-          const present = session[student.id] === "Present";
-          return (
-            <div
-              key={student.id}
-              className={`attendance-tile ${present ? "present" : "absent"}`}
-              onClick={() => toggleStatus(student.id)}
-            >
-              <div className="tile-identity">
-                <span className="roll-chip">{student.rollNumber || "N/A"}</span>
-                <span>{student.name}</span>
-              </div>
-              <strong>{present ? "Present" : "Absent"}</strong>
-            </div>
-          );
-        })}
+        {students.map((s) => (
+          <div
+            key={s.id}
+            className={`attendance-circle ${attendance[s.id] === "Present" ? "present" : "absent"
+              }`}
+            onClick={() => toggleStatus(s.id)}
+          >
+            <span className="roll-number">{s.rollNumber}</span>
+          </div>
+        ))}
       </div>
-    </article>
+
+      <div className="attendance-actions">
+        <button className="save-session-btn" onClick={saveSession}>
+          Save Session
+        </button>
+
+        <button className="export-csv-btn" onClick={exportTodayCSV}>
+          Export CSV
+        </button>
+      </div>
+    </div>
   );
 }
-

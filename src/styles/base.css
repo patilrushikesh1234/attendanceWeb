@@ -1,57 +1,41 @@
-/* Global base styles */
+/* -------------------- VARIABLES -------------------- */
 :root {
-  color-scheme: light;
-  font-family: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
-  --bg: #f5f6fb;
-  --card-bg: #ffffff;
   --primary: #4f46e5;
   --primary-dark: #4338ca;
+  --bg: #f6f7fb;
+  --card-bg: #ffffff;
   --muted: #6b7280;
-  --border: #e5e7eb;
   --danger: #dc2626;
+  --border: #e5e7eb;
+  --text: #111827;
   --success: #059669;
 }
 
-*,
-*::before,
-*::after {
+/* -------------------- GLOBAL -------------------- */
+* {
   box-sizing: border-box;
 }
 
 body {
   margin: 0;
-  min-height: 100vh;
+  font-family: "Inter", sans-serif;
   background: var(--bg);
-  color: #111827;
-}
-
-#root {
-  min-height: 100vh;
-}
-
-button {
-  font: inherit;
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
+  color: var(--text);
+  line-height: 1.6;
+  background-color: #031510;
 }
 
 .visually-hidden {
   position: absolute;
   width: 1px;
   height: 1px;
-  margin: -1px;
-  padding: 0;
   overflow: hidden;
-  border: 0;
-  clip: rect(0 0 0 0);
+  clip: rect(0,0,0,0);
   white-space: nowrap;
 }
 
 .empty-state {
   color: var(--muted);
-  font-size: 0.95rem;
+  font-size: 14px;
+  margin: 8px 0;
 }
-

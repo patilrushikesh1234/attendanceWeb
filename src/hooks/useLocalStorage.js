@@ -1,9 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
 
-/**
- * Small hook that mirrors a piece of state into localStorage.
- * Falls back gracefully if the stored value can't be parsed.
- */
 export default function useLocalStorage(key, initialValue) {
   const readValue = useCallback(() => {
     if (typeof window === "undefined") return initialValue;
@@ -24,29 +20,15 @@ export default function useLocalStorage(key, initialValue) {
       window.dispatchEvent(
         new CustomEvent("local-storage", { detail: { key, value } })
       );
-    } catch {
-      /* no-op */
-    }
+    } catch {}
   }, [key, value]);
 
   useEffect(() => {
-    if (typeof window === "undefined") return undefined;
-
-    const handleStorage = (event) => {
-      if (event.key === key) {
-        setValue(readValue());
-      }
-    };
-
-    const handleCustom = (event) => {
-      if (event.detail?.key === key) {
-        setValue(event.detail.value);
-      }
-    };
-
+    if (typeof window === "undefined") return;
+    const handleStorage = (event) => { if (event.key === key) setValue(readValue()); };
+    const handleCustom = (event) => { if (event.detail?.key === key) setValue(event.detail.value); };
     window.addEventListener("storage", handleStorage);
     window.addEventListener("local-storage", handleCustom);
-
     return () => {
       window.removeEventListener("storage", handleStorage);
       window.removeEventListener("local-storage", handleCustom);

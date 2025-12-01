@@ -1,106 +1,116 @@
-import React, { useMemo, useState } from "react";
-import useLocalStorage from "../../hooks/useLocalStorage";
+import React, { useState, useEffect } from "react";
+import "../../styles/AddStudent.css";
 import { loadJSON, saveJSON } from "../../utils/helpers";
-import "../../styles/components/AddStudent.css";
 
-const getId = () =>
-  typeof crypto !== "undefined" && crypto.randomUUID
-    ? crypto.randomUUID()
-    : `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+export default function AddStudent({ classId }) {
+  const [students, setStudents] = useState([]);
 
-export default function AddStudent() {
-  const [students, setStudents] = useLocalStorage("students", []);
   const [name, setName] = useState("");
-  const [roll, setRoll] = useState("");
+  const [rollNumber, setRollNumber] = useState("");
   const [error, setError] = useState("");
 
-  const rollTaken = useMemo(() => new Set(students.map((s) => s.rollNumber?.trim().toLowerCase()).filter(Boolean)), [students]);
+  const storageKey = `students_${classId}`; // unique key per class
 
-  const handleAdd = (event) => {
-    event.preventDefault();
-    const trimmedName = name.trim();
-    const trimmedRoll = roll.trim();
+  useEffect(() => {
+    const saved = loadJSON(storageKey, []);
+    setStudents(saved);
+  }, [classId]);
 
-    if (!trimmedName || !trimmedRoll) {
-      setError("Both name and roll number are required.");
+  // 🟢 Name Validation: Alphabets only
+  const handleNameChange = (e) => {
+    const value = e.target.value;
+
+    if (/^[A-Za-z ]*$/.test(value)) {
+      setName(value);
+      setError("");
+    } else {
+      setError("Name should contain alphabets only (A-Z).");
+    }
+  };
+
+  // 🔵 Roll Number Validation: Numbers only
+  const handleRollChange = (e) => {
+    const value = e.target.value;
+
+    if (/^[0-9]*$/.test(value)) {
+      setRollNumber(value);
+      setError("");
+    } else {
+      setError("Roll Number should contain numbers only (0-9).");
+    }
+  };
+
+  const handleAddStudent = (e) => {
+    e.preventDefault();
+
+    if (!name.trim() || !rollNumber.trim()) {
+      setError("Name and Roll Number are required");
       return;
     }
-    if (rollTaken.has(trimmedRoll.toLowerCase())) {
-      setError("This roll number is already assigned.");
+
+    if (students.find((s) => s.rollNumber === rollNumber)) {
+      setError("Roll Number must be unique in this class");
       return;
     }
 
-    setStudents((prev) => [...prev, { id: getId(), name: trimmedName, rollNumber: trimmedRoll }]);
+    const newStudent = { id: Date.now(), name, rollNumber };
+    const updated = [...students, newStudent];
+
+    setStudents(updated);
+    saveJSON(storageKey, updated);
+
     setName("");
-    setRoll("");
+    setRollNumber("");
     setError("");
   };
 
-  const handleRemove = (studentId) => {
-    setStudents((prev) => prev.filter((student) => student.id !== studentId));
-
-    // Clean up existing attendance records for removed student
-    const records = loadJSON("records", {});
-    Object.keys(records).forEach((date) => {
-      if (records[date]?.[studentId]) {
-        delete records[date][studentId];
-      }
-    });
-    saveJSON("records", records);
+  const handleDelete = (id) => {
+    const updated = students.filter((s) => s.id !== id);
+    setStudents(updated);
+    saveJSON(storageKey, updated);
   };
 
   return (
-    <article className="add-card">
-      <div>
-        <p className="visually-hidden">Add or manage students</p>
-        <h2>Students</h2>
-        <p className="empty-state">Create and maintain your roster.</p>
-      </div>
+    <div className="add-card">
+      <h2>Add Student</h2>
 
-      <form className="add-form" onSubmit={handleAdd}>
+      <form className="add-form" onSubmit={handleAddStudent}>
         <input
           className="add-input"
-          placeholder="Full name"
+          type="text"
+          placeholder="Student Name"
           value={name}
-          onChange={(event) => {
-            setName(event.target.value);
-            setError("");
-          }}
+          onChange={handleNameChange}
         />
+
         <input
           className="add-input"
-          placeholder="Roll number"
-          value={roll}
-          onChange={(event) => {
-            setRoll(event.target.value);
-            setError("");
-          }}
+          type="text"
+          placeholder="Roll Number"
+          value={rollNumber}
+          onChange={handleRollChange}
         />
+
         <button className="add-submit" type="submit">
-          Add student
+          Add Student
         </button>
       </form>
-      {error && <p className="form-error">{error}</p>}
+
+      {error && <div className="form-error">{error}</div>}
 
       <div className="students-list">
-        {students.length === 0 && <p className="empty-state">No students yet.</p>}
-        {students.map((student) => (
-          <div className="student-pill" key={student.id}>
+        {students.map((s) => (
+          <div key={s.id} className="student-pill">
             <div>
-              <strong>{student.name}</strong>
-              <small>Roll: {student.rollNumber || "—"}</small>
+              <strong>{s.name}</strong>
+              <small>Roll: {s.rollNumber}</small>
             </div>
-            <button
-              type="button"
-              className="pill-action"
-              onClick={() => handleRemove(student.id)}
-            >
-              Remove
+            <button className="pill-action" onClick={() => handleDelete(s.id)}>
+              Delete
             </button>
           </div>
         ))}
       </div>
-    </article>
+    </div>
   );
 }
-

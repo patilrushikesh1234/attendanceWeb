@@ -1,0 +1,133 @@
+.dashboard-hero {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, #4f46e5, #1e62ff);
+  padding: 28px 32px;
+  border-radius: 18px;
+  color: white;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+/* WAVE LAYER */
+.dashboard-hero::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 20%, transparent 60%);
+  animation: waveflow 6s linear infinite;
+  opacity: 0.5;
+}
+
+/* Wave Animation */
+@keyframes waveflow {
+  0% {
+    transform: translateX(-20%) translateY(5%) rotate(0deg);
+  }
+
+  50% {
+    transform: translateX(-10%) translateY(15%) rotate(180deg);
+  }
+
+  100% {
+    transform: translateX(-20%) translateY(5%) rotate(360deg);
+  }
+}
+
+.dashboard-hero h1 {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 800;
+  z-index: 2;
+  position: relative;
+}
+
+.dashboard-actions {
+  position: relative;
+  z-index: 2;
+}
+
+.college-name h2 {
+  font-size: 28px;
+  font-weight: 700;
+  text-align: center;
+  background: linear-gradient(90deg,
+      #0a0a0a,
+      #ff7f00,
+      #2b2b1a,
+      #00ff00,
+      #0000ff,
+      #4b0082,
+      #8b00ff);
+  background-size: 400%;
+  -webkit-background-clip: text;
+  color: transparent;
+  animation: rainbowFlow 20s linear infinite;
+}
+
+/* Rainbow shift animation */
+@keyframes rainbowFlow {
+  0% {
+    background-position: 0%;
+  }
+
+  100% {
+    background-position: 400%;
+  }
+}
+
+
+.add-student-btn {
+  padding: 12px 22px;
+  font-size: 15px;
+  font-weight: 700;
+  border-color: #0a0a0a;
+  border-radius: 12px;
+  background: #1e62ff;
+  color: white;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  z-index: 1;
+  transition: 0.2s ease;
+}
+
+/* Wavy water layer */
+.add-student-btn::before {
+  content: "";
+  position: absolute;
+  bottom: -20%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: 40%;
+  animation: liquidWave 6s ease-in-out infinite;
+  z-index: -1;
+}
+
+@keyframes liquidWave {
+  0% {
+    transform: translateX(0) translateY(0) rotate(0deg);
+  }
+
+  50% {
+    transform: translateX(20%) translateY(8%) rotate(180deg);
+  }
+
+  100% {
+    transform: translateX(0) translateY(0) rotate(360deg);
+  }
+}
+
+/* Hover bounce + shadow */
+.add-student-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 18px rgba(30, 98, 255, 0.5);
+}

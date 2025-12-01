@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import PasswordGate from "./pages/PasswordGate";
 import Dashboard from "./pages/Dashboard";
 
@@ -6,7 +6,14 @@ export default function App() {
   const [isUnlocked, setIsUnlocked] = useState(false);
 
   useEffect(() => {
-    setIsUnlocked(localStorage.getItem("accessAllowed") === "true");
+    localStorage.removeItem("accessAllowed");
+    setIsUnlocked(false);
+  }, []);
+
+  useEffect(() => {
+    const handleBeforeUnload = () => localStorage.removeItem("accessAllowed");
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
   }, []);
 
   const handleSuccess = () => {
@@ -19,9 +26,5 @@ export default function App() {
     setIsUnlocked(false);
   };
 
-  if (!isUnlocked) {
-    return <PasswordGate onSuccess={handleSuccess} />;
-  }
-
-  return <Dashboard onLogout={handleLogout} />;
+  return !isUnlocked ? <PasswordGate onSuccess={handleSuccess} /> : <Dashboard onLogout={handleLogout} />;
 }

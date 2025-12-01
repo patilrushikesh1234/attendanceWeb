@@ -1,87 +1,88 @@
-import React, { useMemo } from "react";
-import { exportSemesterCSV } from "../../utils/helpers";
-import useLocalStorage from "../../hooks/useLocalStorage";
-import "../../styles/components/SemesterReport.css";
+import React, { useState, useEffect } from "react";
+import { loadJSON, exportSemesterCSV } from "../../utils/helpers";
+import "../../styles/SemesterReport.css";
 
-export default function SemesterReport() {
-  const [students] = useLocalStorage("students", []);
-  const [records] = useLocalStorage("records", {});
+export default function SemesterReport({ classId, refresh }) {
+  const [reportData, setReportData] = useState([]);
 
-  const stats = useMemo(() => {
-    const dates = Object.keys(records);
-    const totalDays = dates.length;
-    return students.map((student) => {
-      const present = dates.reduce(
-        (count, date) =>
-          records[date]?.[student.id] === "Present" ? count + 1 : count,
-        0
-      );
-      const percent = totalDays ? ((present / totalDays) * 100).toFixed(1) : "0.0";
+  const attendanceKey = `attendance_${classId}`;
+  const studentsKey = `students_${classId}`;
+
+  useEffect(() => {
+    const students = loadJSON(studentsKey, []);
+    const allAttendance = loadJSON(attendanceKey, {});
+
+    // Build report
+    const report = students.map(s => {
+      let total = 0, present = 0;
+      Object.values(allAttendance).forEach(dayRecord => {
+        if (dayRecord[s.id]) {
+          total++;
+          if (dayRecord[s.id] === "Present") present++;
+        }
+      });
+      const absent = total - present;
+      const percent = total ? Math.round((present / total) * 100) : 0;
       return {
-        id: student.id,
-        name: student.name,
-        rollNumber: student.rollNumber,
+        id: s.id,
+        rollNumber: s.rollNumber,
+        name: s.name,
+        total,
         present,
-        absent: totalDays - present,
-        total: totalDays,
-        percent,
+        absent,
+        percent
       };
     });
-  }, [students, records]);
 
-  const handleDownload = () => exportSemesterCSV(stats);
+    setReportData(report);
+
+  }, [classId, refresh]); // refresh triggers immediate reload
+
+  const handleExport = () => {
+    if (reportData.length === 0) {
+      alert("No data to export");
+      return;
+    }
+    exportSemesterCSV(reportData);
+  };
 
   return (
-    <article className="report-card">
+    <div className="report-card">
       <div className="report-header">
-        <div>
-          <h2>Semester Report</h2>
-          <p className="empty-state">75% minimum attendance required.</p>
-        </div>
-        <button className="download-btn" type="button" onClick={handleDownload}>
-          Export CSV
-        </button>
+        <h2>Semester Report</h2>
+        <button className="download-btn" onClick={handleExport}>Export CSV</button>
       </div>
-
+      <div className="scroll">
+        <marquee behavior="scroll" direction="left">Minimum 75% Attendace require</marquee>
+      </div>
       <table className="report-table">
         <thead>
           <tr>
-            <th>Roll</th>
-            <th>Student</th>
-            <th>Present / Total</th>
-            <th>Percentage</th>
+            <th>Roll No</th>
+            <th> Student Name</th>
+            <th>Present</th>
+            <th>Absent</th>
+            <th>%</th>
             <th>Status</th>
           </tr>
         </thead>
         <tbody>
-          {stats.map((student) => {
-            const isEligible = parseFloat(student.percent) >= 75;
-            return (
-              <tr key={student.id}>
-                <td>{student.rollNumber || "N/A"}</td>
-                <td>{student.name}</td>
-                <td>
-                  {student.present} / {student.total}
-                </td>
-                <td>{student.percent}%</td>
-                <td>
-                  <span className={`badge ${isEligible ? "ok" : "low"}`}>
-                    {isEligible ? "Eligible" : "Low attendance"}
-                  </span>
-                </td>
+          {reportData.length === 0 ? (
+            <tr><td colSpan="7" className="empty-state">No data</td></tr>
+          ) : (
+            reportData.map(s => (
+              <tr key={s.id}>
+                <td>{s.rollNumber}</td>
+                <td>{s.name}</td>
+                <td>{s.present}</td>
+                <td>{s.absent}</td>
+                <td>{s.percent}%</td>
+                <td>{s.percent >= 75 ? "Eligible" : "Low Attendance"}</td>
               </tr>
-            );
-          })}
-          {stats.length === 0 && (
-            <tr>
-              <td colSpan="5" className="empty-state">
-                No records yet.
-              </td>
-            </tr>
+            ))
           )}
         </tbody>
       </table>
-    </article>
+    </div>
   );
 }
-

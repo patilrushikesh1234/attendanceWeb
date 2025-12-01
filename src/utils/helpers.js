@@ -1,7 +1,9 @@
-// helpers: CSV + localStorage helpers
+// helpers.js
+
+// ---------------- CSV Export ----------------
 export function downloadCSV(filename, rows) {
   const escapeCell = (c) => {
-    if (c === null || c === undefined) return "";
+    if (c == null) return "";
     const s = String(c);
     if (/[",\n]/.test(s)) return `"${s.replace(/"/g, '""')}"`;
     return s;
@@ -18,24 +20,29 @@ export function downloadCSV(filename, rows) {
   URL.revokeObjectURL(url);
 }
 
-export function exportTodayAttendanceCSV({ dateStr, students = [], record = {} }) {
-  const rows = [["Date", "Roll Number", "Student Name", "Status"]];
-  students.forEach(s => {
-    rows.push([dateStr, s.rollNumber || "", s.name, record[s.id] || "Absent"]);
-  });
-  downloadCSV(`attendance_${dateStr}.csv`, rows);
-}
+// ---------------- Export Semester CSV ----------------
+export function exportSemesterCSV(reportData = []) {
+  const rows = [
+    ["Roll Number", "Student Name", "Total Days", "Present", "Absent", "Percentage", "Status"]
+  ];
 
-export function exportSemesterCSV(stats = []) {
-  const rows = [["Roll Number", "Student Name", "Total Days", "Present", "Absent", "Percentage", "Status"]];
-  stats.forEach(r => {
+  reportData.forEach(r => {
     const status = parseFloat(r.percent) >= 75 ? "Eligible" : "Low Attendance";
-    rows.push([r.rollNumber || "", r.name, r.total, r.present, r.absent, `${r.percent}%`, status]);
+    rows.push([
+      r.rollNumber || "",
+      r.name || "",
+      r.total || 0,
+      r.present || 0,
+      r.absent || 0,
+      `${r.percent || 0}%`,
+      status
+    ]);
   });
+
   downloadCSV("semester_report.csv", rows);
 }
 
-// localStorage helpers (small)
+// ---------------- Local Storage ----------------
 export function loadJSON(key, fallback) {
   try {
     const raw = localStorage.getItem(key);
@@ -44,6 +51,7 @@ export function loadJSON(key, fallback) {
     return fallback;
   }
 }
+
 export function saveJSON(key, value) {
   localStorage.setItem(key, JSON.stringify(value));
 }
