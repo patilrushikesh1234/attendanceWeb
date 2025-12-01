@@ -16,12 +16,14 @@ export default function SemesterReport({ classId, refresh }) {
     const report = students.map(s => {
       let total = 0, present = 0;
       Object.values(allAttendance).forEach(dayRecord => {
-        if (dayRecord[s.id]) {
-          total++;
-          if (dayRecord[s.id] === "Present") present++;
-        }
-      });
-      const absent = total - present;
+  total++;  // Count every day
+  if (dayRecord[s.id] === "Present") {
+    present++;
+  }
+});
+const absent = total - present;
+
+      
       const percent = total ? Math.round((present / total) * 100) : 0;
       return {
         id: s.id,
