@@ -102,8 +102,8 @@ export default function AddStudent({ classId }) {
         {students.map((s) => (
           <div key={s.id} className="student-pill">
             <div>
-              <strong>{s.name}</strong>
-              <small>Roll: {s.rollNumber}</small>
+              Name :-<strong>{s.name}</strong>
+              <small>Roll No- : {s.rollNumber}</small>
             </div>
             <button className="pill-action" onClick={() => handleDelete(s.id)}>
               Delete
